@@ -12,6 +12,7 @@ import random
 # 仿真图像和探针的配置
 from config import *
 from utils.func import *
+from utils.sim_probe import *
 
 image_size = 256
 cropsize = 64
@@ -37,16 +38,30 @@ class SimGenerator():
         obj = obj_am*np.exp(obj_ph*1j)
         # 对probe进行前向传播
         probe = propagate(probe,'Fresnel', ptycho_config)
+        # show_object_and_probe(probe, obj_am, obj_ph)
+
         # get diffractions image,postions,illuindy,illuindx
-        diffset,positions,illuindx,illuindy=ccd_intensities(obj, probe, ptycho_config, 'Fourier')
-        probe_r =np.zeros(diffset[2].shape)
+        diffset,positions,illuindx,illuindy = ccd_intensities(obj, probe, ptycho_config, 'Fourier')
+        # 形成初步的探针重构图像
+        probe_r = np.zeros(diffset[2].shape)
+        # 所有衍射图像的平方根的总和
+        for i in range(len(diffset)):
+            diffset[i] = imcrop(diffset[i], pixsum=cropsize)
+            # cv2.imwrite(f"diffset/diffset_{i}.png", diffset[i])
+            probe_r += np.sqrt(diffset[i])
+        # difine object shape(needed for reconstruction)
+        probe_r = lowPassFiltering(probe_r, 17)
+        probe_r = fft.ifft2(probe_r)/len(diffset)
+        probe_r = abs(fft.ifftshift(probe_r))
+        probe_r = probe_r / np.max(probe_r)
+        
 
 
 
 if __name__ == '__main__':
     generator = SimGenerator()
-    obj_am = cv2.imread('simulate_data/image_data/test_data/cameraman256.png',cv2.IMREAD_GRAYSCALE)
-    obj_ph = cv2.imread('simulate_data/image_data/test_data/lena256.png',cv2.IMREAD_GRAYSCALE)
+    obj_am = cv2.imread('simulate_data/image_data/test_data/airplane256.png',cv2.IMREAD_GRAYSCALE)
+    obj_ph = cv2.imread('simulate_data/image_data/test_data/boat256.png',cv2.IMREAD_GRAYSCALE)
     generator.generate_single_obj(obj_am, obj_ph)
 
 
