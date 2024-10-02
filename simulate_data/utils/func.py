@@ -1,3 +1,6 @@
+"""
+These func were derived by @author: Xianming Wu
+"""
 import  numpy as np
 from  math import pi
 from numpy import fft
@@ -5,7 +8,6 @@ import cv2
 import matplotlib.pyplot as plt
 
 def overlap_rate(r,delta):
-    # This formula is derived by @author: Xianming Wu
     overlap=(2*r**2*np.arctan(np.sqrt(r*r-delta**2/4)/(0.5*delta))\
               - delta*np.sqrt(r**2-0.25*delta**2)) / (3.14*r**2)
     return overlap
