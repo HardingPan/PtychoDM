@@ -131,6 +131,7 @@ def ccd_intensities(object, probe, ptycho_cfg, propagator):
     illuindy, illuindx = np.indices((probe.shape))  # 创建采样范围的索引
 
     for pos in positions:
+        # 实际使用, 不带相位
         # 传播到远场并计算绝对值平方作为衍射强度
         img, sum = poisson_noise(
             abs(
@@ -139,6 +140,9 @@ def ccd_intensities(object, probe, ptycho_cfg, propagator):
             alpha=1, sum=sum
         )
         diffset.append(abs(img))  # 存储强度图像
+
+        # 带相位
+        # diffset.append(propagate(object[pos[0] + illuindy, pos[1] + illuindx] * probe, propagator, ptycho_cfg))
     # print('Diffraction pattern created')  # 打印信息表示已创建衍射图样
     # cv2.imwrite("output.png", diffset[10])
 

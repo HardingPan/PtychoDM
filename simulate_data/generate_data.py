@@ -51,7 +51,10 @@ class SimGenerator():
         probe_r = np.zeros(diffset[2].shape)
         # 所有衍射图像的平方根的总和
         for i in range(len(diffset)):
-            diffset[i] = imcrop(diffset[i], pixsum=cropsize)
+            diffset[i] = np.sqrt(imcrop(diffset[i], pixsum=cropsize))
+            # 验证衍射图像时
+            # probe_r += np.sqrt(np.abs(diffset[i]))
+            # 实际应用时
             probe_r += np.sqrt(diffset[i])
 
         # 去掉 obj_am 和 obj_ph 文件名中的扩展名
